@@ -14,7 +14,7 @@ class UserService:
         if user:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail= f'O email {email} já está cadastrado no sistema!'
+                detail=f'O email {email} já está cadastrado no sistema!'
             )
         return user
     
@@ -24,10 +24,11 @@ class UserService:
         
         if not user:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
+                status_code=status.HTTP_404_NOT_FOUND, # Ajustado para 404
                 detail=f'Não há usuário com o ID {user_id}!'
             )
         return user
+
     # ----------------------------------------- Functions of System -------------------------------------------------
     @staticmethod
     def create_user(db: Session, user_data: UserCreate):
@@ -38,11 +39,11 @@ class UserService:
         hashed_password = bcrypt.hashpw(password_bytes, salt).decode('utf-8')
 
         user_dict = {
-            "name":user_data.name,
-            "email":user_data.email,
-            "hashed_password":hashed_password,
-            "abre_rnc":user_data.abre_rnc,
-            "responsavel_setor":user_data.responsavel_setor
+            "name": user_data.name,
+            "email": user_data.email,
+            "hashed_password": hashed_password,
+            "abre_rnc": user_data.abre_rnc,
+            "responsavel_setor": user_data.responsavel_setor
         }
 
         return UserRepository.create_user(db, user_dict)
@@ -52,6 +53,15 @@ class UserService:
         user = UserService.exist_user_by_id(db, user_id)
         
         update_data = user_data.model_dump(exclude_unset=True)
+        
+        # Valida se o novo email já pertence a outro usuário
+        if "email" in update_data and update_data["email"] != user.email:
+            existing = UserRepository.get_user_by_email(db, update_data["email"])
+            if existing:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f'O email {update_data["email"]} já está em uso por outro usuário!'
+                )
         
         if "password" in update_data and update_data["password"]:
             password_bytes = update_data["password"].encode('utf-8')
@@ -77,5 +87,4 @@ class UserService:
     
     @staticmethod
     def get_user_by_id(db: Session, id: int):
-        user = UserService.exist_user_by_id(db, id)
-        return user
+        return UserService.exist_user_by_id(db, id)
