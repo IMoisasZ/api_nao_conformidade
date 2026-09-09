@@ -3,7 +3,7 @@ def clean_and_validate_string(v: str, min_length: int=0) -> str:
 
     Args:
         v (str): O texto que será verificado.
-        min_length (int=0): parametro 
+        min_length (int=0): parametro para informar a quantidade minima de caracteres aceitos
 
     Returns:
         str: O texto limpo e validado sem espaços nas pontas.
