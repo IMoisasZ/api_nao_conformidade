@@ -1,6 +1,7 @@
 from app.core.database import engine, Base
 # Importamos o model User para que o SQLAlchemy saiba que ele existe e deve ser criado
 from app.users.models import User
+from app.sector.models import Sector
 
 def init_db():
     print("Conectando ao MySQL e criando as tabelas...")
