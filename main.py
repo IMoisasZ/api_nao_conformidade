@@ -4,7 +4,9 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from app.core.database import engine, Base
 from app.users.models import User  # Importante para o SQLAlchemy registrar a tabela
+from app.sector.models import Sector
 from app.users.router import router as users_router
+from app.sector.router import router as sector_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -35,6 +37,7 @@ async def validation_exception_handler(request, exc):
 
 
 app.include_router(users_router, prefix="/api/v1")
+app.include_router(sector_router, prefix="/api/v1")
 
 @app.get("/")
 def root():
